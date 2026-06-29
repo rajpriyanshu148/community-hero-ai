@@ -1,0 +1,402 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// Enums
+// ============================================================
+
+enum UserRole {
+  CITIZEN
+  VOLUNTEER
+  AUTHORITY
+  ADMIN
+}
+
+enum IssueCategory {
+  POTHOLE
+  WATER_LEAKAGE
+  GARBAGE
+  STREETLIGHT
+  SEWAGE
+  INFRASTRUCTURE
+  OTHER
+}
+
+enum IssueSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IssueStatus {
+  SUBMITTED
+  AI_VERIFIED
+  COMMUNITY_VERIFIED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum VerificationResult {
+  EXISTS
+  FAKE
+  RESOLVED
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+enum MissionType {
+  VERIFY
+  INSPECT
+  REPORT
+}
+
+enum MissionStatus {
+  PENDING
+  ACCEPTED
+  COMPLETED
+}
+
+enum VolunteerSkillType {
+  ELECTRICIAN
+  CARPENTER
+  PAINTER
+  PLUMBER
+  CLEANER
+  TECHNICIAN
+}
+
+// ============================================================
+// Models
+// ============================================================
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  name         String
+  avatar       String?
+  role         UserRole @default(CITIZEN)
+  trustScore   Float    @default(50)
+  xp           Int      @default(0)
+  level        Int      @default(1)
+  isActive     Boolean  @default(true)
+  isBanned     Boolean  @default(false)
+  deletedAt    DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Auth
+  googleId     String?  @unique
+  passwordHash String?
+
+  // Civic data
+  ward         String?
+  badges       Json     @default("[]")
+
+  // Relations
+  notifications     Notification[]
+  reportedIssues    Issue[]            @relation("ReportedBy")
+  assignedIssues    Issue[]            @relation("AssignedTo")
+  verifications     Verification[]
+  missions          MissionAssignment[]
+  comments          Comment[]
+  ledgerEntries     LedgerEntry[]      @relation("ActorLedger")
+  trustHistory      TrustHistory[]
+  skills            VolunteerSkill[]
+  votes             Vote[]
+
+  @@map("users")
+}
+
+model Issue {
+  id              String        @id @default(uuid()) @db.Uuid
+  title           String
+  description     String        @db.Text
+  category        IssueCategory
+  severity        IssueSeverity @default(MEDIUM)
+  status          IssueStatus   @default(SUBMITTED)
+
+  // Location
+  lat             Float
+  lng             Float
+  address         String?
+  ward            String?
+
+  // Media & AI
+  mediaUrls       Json          @default("[]")
+  aiAnalysis      Json?
+
+  // Scoring
+  upvotes         Int           @default(0)
+  downvotes       Int           @default(0)
+  civicScore      Float         @default(0)
+
+  // SLA
+  slaDeadline     DateTime?
+  resolvedAt      DateTime?
+
+  // Flags
+  isDeleted       Boolean       @default(false)
+  isFraudFlagged  Boolean       @default(false)
+  duplicateOfId   String?       @db.Uuid
+
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Foreign keys
+  reportedById    String        @db.Uuid
+  assignedToId    String?       @db.Uuid
+  departmentId    String?       @db.Uuid
+
+  // Relations
+  reportedBy      User          @relation("ReportedBy", fields: [reportedById], references: [id])
+  assignedTo      User?         @relation("AssignedTo", fields: [assignedToId], references: [id])
+  department      Department?   @relation(fields: [departmentId], references: [id])
+  duplicateOf     Issue?        @relation("Duplicates", fields: [duplicateOfId], references: [id])
+  duplicates      Issue[]       @relation("Duplicates")
+
+  verifications   Verification[]
+  votes           Vote[]
+  comments        Comment[]
+  ledger          LedgerEntry[]
+  predictions     Prediction[]
+
+  @@index([status])
+  @@index([category])
+  @@index([ward])
+  @@index([reportedById])
+  @@index([lat, lng])
+  @@index([isDeleted])
+  @@map("issues")
+}
+
+model Verification {
+  id          String             @id @default(uuid()) @db.Uuid
+  issueId     String             @db.Uuid
+  userId      String             @db.Uuid
+  result      VerificationResult
+  trustWeight Float              @default(1.0)
+  notes       String?
+  createdAt   DateTime           @default(now())
+
+  issue       Issue              @relation(fields: [issueId], references: [id])
+  user        User               @relation(fields: [userId], references: [id])
+
+  @@unique([issueId, userId])
+  @@index([issueId])
+  @@map("verifications")
+}
+
+model Vote {
+  id        String   @id @default(uuid()) @db.Uuid
+  issueId   String   @db.Uuid
+  userId    String   @db.Uuid
+  type      VoteType
+  createdAt DateTime @default(now())
+
+  issue     Issue    @relation(fields: [issueId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([issueId, userId])
+  @@index([issueId])
+  @@map("votes")
+}
+
+model Department {
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String        @unique
+  category    IssueCategory
+  slaCritical Int           @default(4)   // hours
+  slaHigh     Int           @default(24)
+  slaMedium   Int           @default(72)
+  slaLow      Int           @default(168)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  issues      Issue[]
+
+  @@map("departments")
+}
+
+model Mission {
+  id          String             @id @default(uuid()) @db.Uuid
+  title       String
+  description String             @db.Text
+  type        MissionType
+  xpReward    Int                @default(100)
+  ward        String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  assignments MissionAssignment[]
+
+  @@map("missions")
+}
+
+model MissionAssignment {
+  id          String        @id @default(uuid()) @db.Uuid
+  missionId   String        @db.Uuid
+  userId      String        @db.Uuid
+  status      MissionStatus @default(PENDING)
+  completedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  mission     Mission       @relation(fields: [missionId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+
+  @@unique([missionId, userId])
+  @@map("mission_assignments")
+}
+
+model Badge {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String
+  icon        String
+  xpRequired  Int      @default(0)
+  users       Json     @default("[]") // Array of user IDs who have this badge
+  createdAt   DateTime @default(now())
+
+  @@map("badges")
+}
+
+model TrustHistory {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  delta     Float
+  reason    String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("trust_history")
+}
+
+model Prediction {
+  id              String    @id @default(uuid()) @db.Uuid
+  issueType       String
+  ward            String
+  probability     Float
+  reasoning       String    @db.Text
+  weatherContext  String?
+  generatedAt     DateTime  @default(now())
+  expiresAt       DateTime
+
+  issueId         String?   @db.Uuid
+  issue           Issue?    @relation(fields: [issueId], references: [id])
+
+  @@index([ward])
+  @@index([expiresAt])
+  @@map("predictions")
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  type      String
+  title     String
+  message   String
+  payload   Json     @default("{}")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model LedgerEntry {
+  id          String   @id @default(uuid()) @db.Uuid
+  issueId     String   @db.Uuid
+  action      String
+  actorId     String   @db.Uuid
+  actorName   String
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  issue       Issue    @relation(fields: [issueId], references: [id])
+  actor       User     @relation("ActorLedger", fields: [actorId], references: [id])
+
+  @@index([issueId])
+  @@map("ledger_entries")
+}
+
+model VolunteerSkill {
+  id         String             @id @default(uuid()) @db.Uuid
+  userId     String             @db.Uuid
+  skill      VolunteerSkillType
+  isVerified Boolean            @default(false)
+  createdAt  DateTime           @default(now())
+
+  user       User               @relation(fields: [userId], references: [id])
+
+  @@unique([userId, skill])
+  @@index([skill])
+  @@map("volunteer_skills")
+}
+
+model Comment {
+  id        String   @id @default(uuid()) @db.Uuid
+  issueId   String   @db.Uuid
+  userId    String   @db.Uuid
+  content   String   @db.Text
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  issue     Issue    @relation(fields: [issueId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([issueId])
+  @@map("comments")
+}
+
+model WeatherAlert {
+  id        String   @id @default(uuid()) @db.Uuid
+  ward      String?
+  alertType String
+  severity  String
+  message   String
+  lat       Float
+  lng       Float
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([ward])
+  @@index([expiresAt])
+  @@map("weather_alerts")
+}
+
+model Analytics {
+  id                  String   @id @default(uuid()) @db.Uuid
+  date                DateTime @db.Date
+  ward                String
+  totalIssues         Int      @default(0)
+  resolvedIssues      Int      @default(0)
+  avgResolutionTime   Float    @default(0)
+  topCategory         String?
+  wardHealth          Float    @default(100)
+  createdAt           DateTime @default(now())
+
+  @@unique([date, ward])
+  @@index([date])
+  @@index([ward])
+  @@map("analytics")
+}
