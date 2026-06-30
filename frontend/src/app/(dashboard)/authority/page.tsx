@@ -16,7 +16,7 @@ export default function AuthorityDashboard() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/authority/assigned`,
+        `/api/v1/authority/assigned`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
@@ -37,7 +37,7 @@ export default function AuthorityDashboard() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/issues/${issueId}/status`,
+        `/api/v1/issues/${issueId}/status`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );

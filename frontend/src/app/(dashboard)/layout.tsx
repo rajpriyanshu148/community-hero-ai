@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '../../components/shared/Sidebar';
 import { NotificationBell } from '../../components/shared/NotificationBell';
-import { Shield, Loader2 } from 'lucide-react';
+import { Shield, Loader2, ChevronLeft } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/auth.store';
@@ -86,7 +86,14 @@ export default function DashboardLayout({
       >
         {/* Header */}
         <header className="h-16 border-b border-slate-900 bg-slate-950/80 backdrop-blur flex items-center justify-between px-6 sticky top-0 z-40">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-900 bg-slate-950 hover:bg-slate-900 text-xs font-bold text-slate-400 hover:text-white transition-all select-none font-space"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Back</span>
+            </button>
             <span className="text-sm font-bold text-white font-space uppercase tracking-wider md:hidden">
               Community Hero
             </span>

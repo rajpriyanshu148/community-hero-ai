@@ -440,6 +440,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ro
   const merged = getMergedUsers(req);
   const user = getCurrentUser(req, merged);
 
+  // Profile update
+  if (path === 'auth/me') {
+    const body = await req.json();
+    user.name = body.name || user.name;
+    user.email = body.email || user.email;
+    user.ward = body.ward || user.ward;
+
+    const response = NextResponse.json({ success: true, data: { user } });
+    saveUser(req, response, user, merged);
+    return response;
+  }
+
   // Status updates
   if (path.endsWith('/status')) {
     const id = path.split('/')[1];

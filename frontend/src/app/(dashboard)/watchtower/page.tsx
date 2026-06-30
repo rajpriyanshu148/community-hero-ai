@@ -7,8 +7,15 @@ import { PredictionAlert } from '../../../components/shared/PredictionAlert';
 import axios from 'axios';
 
 export default function WatchtowerPage() {
-  const [predictions, setPredictions] = useState<any[]>([]);
-  const [weatherAlerts, setWeatherAlerts] = useState<any[]>([]);
+  const [predictions, setPredictions] = useState<any[]>([
+    { id: 'mock-p1', ward: 'Ward 12 (Indiranagar)', issueType: 'POTHOLE', probability: 0.88, reasoning: 'Incoming heavy monsoon forecast is expected to saturate and expand underlying road cracks on the Metro Corridor.', expiresAt: new Date(Date.now() + 86400000 * 3).toISOString() },
+    { id: 'mock-p2', ward: 'Ward 5 (Marathahalli)', issueType: 'GARBAGE', probability: 0.74, reasoning: 'High weekly festival residue accumulative spikes + local sanitation vehicle maintenance delay warning.', expiresAt: new Date(Date.now() + 86400000 * 2).toISOString() },
+    { id: 'mock-p3', ward: 'Ward 1 (Hebbal)', issueType: 'WATER_LEAKAGE', probability: 0.62, reasoning: 'Pipeline pressure spikes detected on arterial feeder line near main flyover junction.', expiresAt: new Date(Date.now() + 86400000 * 5).toISOString() }
+  ]);
+  const [weatherAlerts, setWeatherAlerts] = useState<any[]>([
+    { id: 'mock-wa1', alertType: 'FLASH_FLOOD_WARNING', message: 'Heavy precipitation forecast for the next 24 hours. Low-lying utility ducts and subways at high risk of waterlogging.', severity: 'CRITICAL' },
+    { id: 'mock-wa2', alertType: 'POWER_GRID_STRESS', message: 'High heat index forecast scaling AC loads, potential transformer failures expected in high-density corridors.', severity: 'MEDIUM' }
+  ]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,20 +25,20 @@ export default function WatchtowerPage() {
         
         // Fetch global predictions
         const predRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/ai/predictions`,
+          `/api/v1/ai/predictions`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (predRes.data.success) {
+        if (predRes.data.success && predRes.data.data?.length > 0) {
           setPredictions(predRes.data.data);
         }
 
         // Fetch weather alerts
         const weatherRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/weather/alerts?lat=12.9715987&lng=77.5945627`,
+          `/api/v1/weather/alerts?lat=12.9715987&lng=77.5945627`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        if (weatherRes.data.success) {
-          setWeatherAlerts(weatherRes.data.data || []);
+        if (weatherRes.data.success && weatherRes.data.data?.length > 0) {
+          setWeatherAlerts(weatherRes.data.data);
         }
       } catch (err) {
         console.error('Error fetching watchtower data:', err);

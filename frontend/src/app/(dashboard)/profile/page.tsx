@@ -14,6 +14,12 @@ export default function ProfilePage() {
   const [selectedSkill, setSelectedSkill] = useState('PLUMBER');
   const [myIssues, setMyIssues] = useState<any[]>([]);
 
+  // Edit profile modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editWard, setEditWard] = useState('Ward 12');
+
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('access_token');
@@ -94,10 +100,21 @@ export default function ProfilePage() {
                 <span>{user?.ward || 'Unassigned Ward'}</span>
               </span>
             </div>
-            <div className="mt-1">
+            <div className="mt-2 flex gap-2">
               <span className="text-[10px] bg-slate-900 text-slate-400 border border-slate-800 px-2 py-0.5 rounded-full font-bold uppercase">
                 {user?.role}
               </span>
+              <button
+                onClick={() => {
+                  setEditName(user?.name || '');
+                  setEditEmail(user?.email || '');
+                  setEditWard(user?.ward || 'Ward 12');
+                  setEditModalOpen(true);
+                }}
+                className="text-[10px] bg-cyan-950/40 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded-full font-bold uppercase hover:bg-cyan-500/10 transition-colors"
+              >
+                Edit Profile
+              </button>
             </div>
           </div>
         </div>
@@ -192,6 +209,107 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {editModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <Card className="glass max-w-sm w-full p-6 border-slate-900 flex flex-col gap-4">
+            <h3 className="text-lg font-bold text-white font-space">Edit Profile</h3>
+            
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-400">Full Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                  placeholder="Aarav Mehta"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-400">Email Address</label>
+                <input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                  placeholder="aarav@example.com"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-slate-400">Select Ward</label>
+                <select
+                  value={editWard}
+                  onChange={(e) => setEditWard(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                >
+                  <option value="Ward 1">Ward 1 (Hebbal)</option>
+                  <option value="Ward 5">Ward 5 (Marathahalli)</option>
+                  <option value="Ward 12">Ward 12 (Indiranagar)</option>
+                  <option value="Ward 17">Ward 17 (HSR Layout)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-2">
+              <Button
+                variant="outline"
+                className="flex-1 border-slate-800 text-slate-350"
+                onClick={() => setEditModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="civic"
+                className="flex-1 text-xs font-bold py-2 h-auto"
+                onClick={async () => {
+                  if (!editName.trim() || !editEmail.trim()) {
+                    toast.error('Name and Email are required.');
+                    return;
+                  }
+                  try {
+                    const token = localStorage.getItem('access_token');
+                    const response = await axios.patch(
+                      `/api/v1/auth/me`,
+                      { name: editName, email: editEmail, ward: editWard },
+                      { headers: { Authorization: `Bearer ${token}` } }
+                    );
+                    if (response.data.success) {
+                      toast.success('Profile updated successfully!');
+                      setUser(response.data.data.user);
+                      
+                      // Sync client fallback database
+                      try {
+                        const localUsers = JSON.parse(localStorage.getItem('local_custom_users') || '[]');
+                        const idx = localUsers.findIndex((u: any) => u.id === response.data.data.user.id);
+                        if (idx !== -1) {
+                          localUsers[idx] = {
+                            ...localUsers[idx],
+                            name: editName,
+                            email: editEmail,
+                            ward: editWard
+                          };
+                          localStorage.setItem('local_custom_users', JSON.stringify(localUsers));
+                        }
+                      } catch (err) {
+                        console.error(err);
+                      }
+                      setEditModalOpen(false);
+                    }
+                  } catch (err) {
+                    toast.error('Failed to update profile.');
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

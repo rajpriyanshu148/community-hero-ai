@@ -97,7 +97,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
       formData.append('media', mediaFile);
 
       // Call API analyze route
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/ai/analyze`, formData, {
+      const response = await axios.post(`/api/v1/ai/analyze`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 

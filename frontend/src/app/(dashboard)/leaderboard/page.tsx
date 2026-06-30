@@ -14,7 +14,7 @@ export default function LeaderboardPage() {
       try {
         const token = localStorage.getItem('access_token');
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/leaderboard`,
+          `/api/v1/leaderboard`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (response.data.success) {

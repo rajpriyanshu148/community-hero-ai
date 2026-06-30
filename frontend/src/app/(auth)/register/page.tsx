@@ -104,47 +104,80 @@ export default function RegisterPage() {
 
       {/* Form panel */}
       <div className="flex items-center justify-center p-6 sm:p-12">
-        <Card className="glass max-w-sm w-full p-8 border-slate-900 flex flex-col gap-5">
+        <Card className="glass max-w-xl w-full p-8 border-slate-900 flex flex-col gap-6">
           <div className="text-center lg:text-left flex flex-col gap-1">
             <h1 className="text-2xl font-bold tracking-tight text-white font-space">Register</h1>
             <p className="text-xs text-slate-400">Join the civic action initiative</p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <Input
-              label="Full Name"
-              {...register('name')}
-              error={errors.name?.message as any}
-              placeholder="Aarav Mehta"
-            />
-            <Input
-              label="Email Address"
-              {...register('email')}
-              error={errors.email?.message as any}
-              placeholder="aarav@example.com"
-            />
-            <Input
-              label="Password"
-              type="password"
-              {...register('password')}
-              error={errors.password?.message as any}
-              placeholder="••••••••"
-            />
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-slate-400">Select Ward</label>
-              <select
-                {...register('ward')}
-                className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-white focus:border-cyan-500/50"
-              >
-                <option value="Ward 1">Ward 1 (Hebbal)</option>
-                <option value="Ward 5">Ward 5 (Marathahalli)</option>
-                <option value="Ward 12">Ward 12 (Indiranagar)</option>
-                <option value="Ward 17">Ward 17 (HSR Layout)</option>
-              </select>
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Full Name"
+                {...register('name')}
+                error={errors.name?.message as any}
+                placeholder="Aarav Mehta"
+              />
+              <Input
+                label="Email Address"
+                {...register('email')}
+                error={errors.email?.message as any}
+                placeholder="aarav@example.com"
+              />
             </div>
 
-            <Button type="submit" variant="civic" className="w-full py-3 h-auto text-sm mt-2" disabled={loading}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Password"
+                type="password"
+                {...register('password')}
+                error={errors.password?.message as any}
+                placeholder="••••••••"
+              />
+              
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-400">Select City</label>
+                <select
+                  defaultValue="Bengaluru"
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 h-[38px] text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                >
+                  <option value="Bengaluru">Bengaluru</option>
+                  <option value="Mumbai">Mumbai</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Hyderabad">Hyderabad</option>
+                  <option value="Pune">Pune</option>
+                  <option value="Chennai">Chennai</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-400">Select Ward</label>
+                <select
+                  {...register('ward')}
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 h-[38px] text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                >
+                  <option value="Ward 1">Ward 1 (Hebbal)</option>
+                  <option value="Ward 5">Ward 5 (Marathahalli)</option>
+                  <option value="Ward 12">Ward 12 (Indiranagar)</option>
+                  <option value="Ward 17">Ward 17 (HSR Layout)</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-400">Register As</label>
+                <select
+                  defaultValue="CITIZEN"
+                  className="bg-slate-950 border border-slate-800 rounded-lg p-2.5 h-[38px] text-sm text-white focus:border-cyan-500/50 focus:outline-none"
+                >
+                  <option value="CITIZEN">Citizen</option>
+                  <option value="VOLUNTEER">Volunteer</option>
+                </select>
+              </div>
+            </div>
+
+            <Button type="submit" variant="civic" className="w-full py-3 h-auto text-sm mt-2 font-bold" disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Register'}
             </Button>
           </form>

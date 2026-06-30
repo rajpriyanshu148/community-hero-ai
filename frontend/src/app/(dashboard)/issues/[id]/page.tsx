@@ -29,7 +29,7 @@ export default function IssueDetailPage() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/issues/${issueId}`,
+        `/api/v1/issues/${issueId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
@@ -65,7 +65,7 @@ export default function IssueDetailPage() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/issues/${issueId}/comment`,
+        `/api/v1/issues/${issueId}/comment`,
         { content: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -149,9 +149,7 @@ export default function IssueDetailPage() {
           {mediaUrls.length > 0 ? (
             <div className="aspect-video w-full rounded-2xl overflow-hidden border border-slate-900 relative">
               <img
-                src={mediaUrls[0].startsWith('/') 
-                  ? `${process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'}${mediaUrls[0]}` 
-                  : mediaUrls[0]}
+                src={mediaUrls[0]}
                 alt="Issue media"
                 className="w-full h-full object-cover"
               />

@@ -18,7 +18,7 @@ export default function AdminPanel() {
       
       // Fetch users
       const usersRes = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/users`,
+        `/api/v1/admin/users`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (usersRes.data.success) {
@@ -27,7 +27,7 @@ export default function AdminPanel() {
 
       // Fetch fraud flagged issues
       const fraudRes = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/fraud`,
+        `/api/v1/admin/fraud`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (fraudRes.data.success) {
@@ -48,7 +48,7 @@ export default function AdminPanel() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/users/${userId}/ban`,
+        `/api/v1/admin/users/${userId}/ban`,
         { isBanned },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -66,7 +66,7 @@ export default function AdminPanel() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/admin/fraud/${issueId}/review`,
+        `/api/v1/admin/fraud/${issueId}/review`,
         { action },
         { headers: { Authorization: `Bearer ${token}` } }
       );
