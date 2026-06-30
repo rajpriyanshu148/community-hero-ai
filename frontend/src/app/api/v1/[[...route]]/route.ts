@@ -131,6 +131,22 @@ function saveUser(req: NextRequest, response: NextResponse, user: any, merged: a
   });
 }
 
+function enrichIssue(issue: any, mergedUsers: any[]) {
+  const reporter = mergedUsers.find(u => u.id === issue.reportedById) || mergedUsers[2];
+  return {
+    ...issue,
+    imageUrls: issue.mediaUrls || [],
+    upvoteCount: issue.upvotes || 0,
+    viewCount: issue.viewCount || 42,
+    reporter: {
+      id: reporter.id,
+      name: reporter.name,
+      avatar: reporter.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${reporter.name}`,
+      trustScore: reporter.trustScore
+    }
+  };
+}
+
 // ============================================================
 // Catch-All Handler
 // ============================================================
@@ -149,17 +165,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
 
   // 2. Issues routes
   if (path === 'issues') {
-    return NextResponse.json({ success: true, data: { issues } });
+    const enriched = issues.map(i => enrichIssue(i, merged));
+    return NextResponse.json({ success: true, data: { issues: enriched } });
   }
   if (path === 'issues/my') {
     const myIssues = issues.filter(i => i.reportedById === user.id);
-    return NextResponse.json({ success: true, data: { issues: myIssues } });
+    const enriched = myIssues.map(i => enrichIssue(i, merged));
+    return NextResponse.json({ success: true, data: { issues: enriched } });
   }
   if (path.startsWith('issues/')) {
     const id = path.split('/')[1];
     const issue = issues.find(i => i.id === id);
     if (!issue) return NextResponse.json({ success: false, message: 'Issue not found' }, { status: 404 });
-    return NextResponse.json({ success: true, data: { issue } });
+    return NextResponse.json({ success: true, data: { issue: enrichIssue(issue, merged) } });
   }
 
   // 3. AI Predictions
@@ -193,7 +211,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
   // 7. Authority assigned
   if (path === 'authority/assigned') {
     const assigned = issues.filter(i => i.departmentId === 'dept-road' || i.assignedToId === user.id);
-    return NextResponse.json({ success: true, data: { issues: assigned } });
+    const enriched = assigned.map(i => enrichIssue(i, merged));
+    return NextResponse.json({ success: true, data: { issues: enriched } });
   }
 
   // 8. Admin lists
@@ -202,7 +221,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
   }
   if (path === 'admin/fraud') {
     const fraud = issues.filter(i => i.isFraudFlagged);
-    return NextResponse.json({ success: true, data: { issues: fraud } });
+    const enriched = fraud.map(i => enrichIssue(i, merged));
+    return NextResponse.json({ success: true, data: { issues: enriched } });
   }
 
   return NextResponse.json({ success: false, message: 'Not found' }, { status: 404 });
@@ -298,7 +318,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
       }
     };
     issues.push(newIssue);
-    return NextResponse.json({ success: true, data: { issue: newIssue } });
+    const enriched = enrichIssue(newIssue, merged);
+    return NextResponse.json({ success: true, data: { issue: enriched } });
   }
 
   // 3. Upvote

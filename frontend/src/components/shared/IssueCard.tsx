@@ -95,7 +95,11 @@ export function IssueCard({ issue, compact = false, className, showReporter = tr
           {!compact && issue.aiAnalysis && (
             <div className="mt-3 p-2.5 rounded-lg bg-cyan-500/5 border border-cyan-500/15">
               <p className="text-xs text-cyan-400 font-medium mb-1">🤖 AI Analysis</p>
-              <p className="text-xs text-slate-400 line-clamp-2">{issue.aiAnalysis.reasoning[0]}</p>
+              <p className="text-xs text-slate-400 line-clamp-2">
+                {Array.isArray(issue.aiAnalysis.reasoning)
+                  ? issue.aiAnalysis.reasoning[0]
+                  : issue.aiAnalysis.reasoning || 'No analysis details provided.'}
+              </p>
             </div>
           )}
 
@@ -125,17 +129,17 @@ export function IssueCard({ issue, compact = false, className, showReporter = tr
               </span>
             </div>
 
-            {showReporter && (
+            {showReporter && issue.reporter && (
               <div className="flex items-center gap-1.5">
                 <Avatar
                   src={issue.reporter.avatar}
-                  name={issue.reporter.name}
+                  name={issue.reporter.name || 'Citizen'}
                   size="xs"
-                  trustScore={issue.reporter.trustScore}
+                  trustScore={issue.reporter.trustScore || 50}
                   showTrustRing
                 />
                 <span className="text-xs text-slate-500 hidden sm:block">
-                  {issue.reporter.name.split(' ')[0]}
+                  {(issue.reporter.name || 'Citizen').split(' ')[0]}
                 </span>
               </div>
             )}
