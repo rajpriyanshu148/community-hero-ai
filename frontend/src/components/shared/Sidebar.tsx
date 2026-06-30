@@ -108,7 +108,7 @@ export function Sidebar({ className }: SidebarProps) {
       animate={{ width: sidebarCollapsed ? 72 : 256 }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       className={cn(
-        'flex-shrink-0 h-full flex flex-col glass-dark border-r border-border overflow-hidden relative',
+        'fixed inset-y-0 left-0 z-35 flex flex-col glass-dark border-r border-border overflow-hidden',
         className
       )}
     >

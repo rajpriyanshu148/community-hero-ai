@@ -9,6 +9,19 @@ import { Avatar } from '@/components/ui/avatar';
 import { useUpvoteIssue } from '@/hooks/useIssues';
 import type { Issue } from '@/types';
 
+const formatCategory = (cat: string): string => {
+  const map: Record<string, string> = {
+    POTHOLE: 'Pothole',
+    WATER_LEAKAGE: 'Water Leak',
+    GARBAGE: 'Garbage',
+    STREETLIGHT: 'Streetlight',
+    SEWAGE: 'Sewage',
+    INFRASTRUCTURE: 'Infrastructure',
+    OTHER: 'Other',
+  };
+  return map[cat] || cat.toLowerCase().replace(/_/g, ' ');
+};
+
 interface IssueCardProps {
   issue: Issue;
   compact?: boolean;
@@ -49,8 +62,8 @@ export function IssueCard({ issue, compact = false, className, showReporter = tr
               <SeverityBadge severity={issue.severity} />
             </div>
             <div className="absolute bottom-2 left-2">
-              <Badge variant="default" className="text-white bg-black/50 backdrop-blur-sm border-white/10">
-                {categoryIcon(issue.category)} {issue.category.toLowerCase().replace(/_/g, ' ')}
+              <Badge variant="default" className="text-white bg-black/50 backdrop-blur-sm border-white/10 whitespace-nowrap">
+                {categoryIcon(issue.category)} {formatCategory(issue.category)}
               </Badge>
             </div>
           </div>
@@ -73,7 +86,7 @@ export function IssueCard({ issue, compact = false, className, showReporter = tr
               <SeverityBadge severity={issue.severity} />
               <StatusBadge status={issue.status} />
               <span className="text-slate-500 text-xs ml-auto">
-                {categoryIcon(issue.category)} {issue.category.toLowerCase().replace(/_/g, ' ')}
+                {categoryIcon(issue.category)} {formatCategory(issue.category)}
               </span>
             </div>
           )}

@@ -8,6 +8,8 @@ import { Shield, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/auth.store';
+import { useUIStore } from '../../store/ui.store';
+import { cn } from '../../lib/utils';
 
 export default function DashboardLayout({
   children,
@@ -57,6 +59,8 @@ export default function DashboardLayout({
     checkAuth();
   }, [router]);
 
+  const { sidebarCollapsed } = useUIStore();
+
   if (checkingAuth) {
     return (
       <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center gap-4 z-50">
@@ -74,7 +78,12 @@ export default function DashboardLayout({
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 md:pl-64">
+      <div
+        className={cn(
+          'flex-1 flex flex-col min-w-0 transition-all duration-300',
+          sidebarCollapsed ? 'md:pl-[72px]' : 'md:pl-64'
+        )}
+      >
         {/* Header */}
         <header className="h-16 border-b border-slate-900 bg-slate-950/80 backdrop-blur flex items-center justify-between px-6 sticky top-0 z-40">
           <div className="flex items-center gap-2">
