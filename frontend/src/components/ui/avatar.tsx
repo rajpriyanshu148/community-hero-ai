@@ -117,10 +117,10 @@ export function Avatar({
       {/* Level Badge */}
       {showLevel && level !== undefined && (
         <div
-          className="absolute -bottom-1 -right-1 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-full flex items-center justify-center font-bold border-2 border-background"
+          className="absolute -bottom-1 -right-1 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white rounded-full flex items-center justify-center font-bold border-2 border-slate-950 shadow-md"
           style={{
-            width: s.outer * 0.4,
-            height: s.outer * 0.4,
+            width: s.outer * 0.45,
+            height: s.outer * 0.45,
             fontSize: s.lvl.replace('text-', '').replace('[', '').replace(']', ''),
           }}
         >

@@ -164,7 +164,7 @@ export function Sidebar({ className }: SidebarProps) {
                   {active && (
                     <motion.div
                       layoutId="active-indicator"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-cyan-400 to-emerald-400 rounded-r-full"
+                      className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-cyan-400 to-emerald-400 rounded-l-lg"
                     />
                   )}
                   <Icon
@@ -210,7 +210,7 @@ export function Sidebar({ className }: SidebarProps) {
             <Avatar
               src={user.avatar}
               name={user.name}
-              size="sm"
+              size="md"
               trustScore={user.trustScore}
               showTrustRing
               level={user.level}
