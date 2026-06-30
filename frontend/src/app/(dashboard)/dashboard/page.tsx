@@ -90,9 +90,9 @@ export default function CitizenDashboard() {
             <div className="flex justify-center items-center py-12">
               <Loader className="w-6 h-6 text-cyan-400 animate-spin" />
             </div>
-          ) : issuesData?.data?.issues?.length > 0 ? (
+          ) : (issuesData as any)?.data?.issues?.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {issuesData.data.issues.map((issue: any) => (
+              {((issuesData as any).data.issues).map((issue: any) => (
                 <IssueCard key={issue.id} issue={issue} />
               ))}
             </div>

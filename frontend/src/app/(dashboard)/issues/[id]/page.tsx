@@ -10,7 +10,7 @@ import { AIAnalysisPanel } from '../../../../components/shared/AIAnalysisPanel';
 import { CivicScoreGauge } from '../../../../components/shared/CivicScoreGauge';
 import { IssueTimeline } from '../../../../components/shared/IssueTimeline';
 import { VerificationPanel } from '../../../../components/shared/VerificationPanel';
-import { useIssues } from '../../../../hooks/useIssues';
+import { useIssues, useUpvoteIssue } from '../../../../hooks/useIssues';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -23,7 +23,7 @@ export default function IssueDetailPage() {
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState<any[]>([]);
 
-  const { upvoteIssue } = useIssues();
+  const upvoteIssue = useUpvoteIssue();
 
   const fetchIssueDetail = async () => {
     try {

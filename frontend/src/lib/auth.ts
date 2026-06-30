@@ -31,17 +31,6 @@ declare module 'next-auth' {
   }
 }
 
-declare module 'next-auth/jwt' {
-  interface JWT {
-    id: string;
-    role: Role;
-    trustScore: number;
-    level: number;
-    wardNumber?: number;
-    wardName?: string;
-    accessToken: string;
-  }
-}
 
 const authConfig: NextAuthConfig = {
   providers: [
@@ -103,15 +92,17 @@ const authConfig: NextAuthConfig = {
   },
   callbacks: {
     async jwt({ token, user, account }) {
+      const t = token as any;
+      const u = user as any;
       // Initial sign in
-      if (user) {
-        token.id = user.id;
-        token.role = (user.role as Role) || Role.CITIZEN;
-        token.trustScore = user.trustScore || 50;
-        token.level = user.level || 1;
-        token.wardNumber = user.wardNumber;
-        token.wardName = user.wardName;
-        token.accessToken = user.accessToken || '';
+      if (u) {
+        t.id = u.id;
+        t.role = u.role || Role.CITIZEN;
+        t.trustScore = u.trustScore || 50;
+        t.level = u.level || 1;
+        t.wardNumber = u.wardNumber;
+        t.wardName = u.wardName;
+        t.accessToken = u.accessToken || '';
       }
 
       // Google OAuth — exchange for backend token
@@ -129,13 +120,13 @@ const authConfig: NextAuthConfig = {
             const data = await res.json();
             if (data.success) {
               const { user: backendUser, accessToken } = data.data;
-              token.id = backendUser.id;
-              token.role = backendUser.role;
-              token.trustScore = backendUser.trustScore;
-              token.level = backendUser.level;
-              token.wardNumber = backendUser.wardNumber;
-              token.wardName = backendUser.wardName;
-              token.accessToken = accessToken;
+              t.id = backendUser.id;
+              t.role = backendUser.role;
+              t.trustScore = backendUser.trustScore;
+              t.level = backendUser.level;
+              t.wardNumber = backendUser.wardNumber;
+              t.wardName = backendUser.wardName;
+              t.accessToken = accessToken;
             }
           }
         } catch (err) {
@@ -147,14 +138,16 @@ const authConfig: NextAuthConfig = {
     },
 
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.trustScore = token.trustScore;
-        session.user.level = token.level;
-        session.user.wardNumber = token.wardNumber;
-        session.user.wardName = token.wardName;
-        session.user.accessToken = token.accessToken;
+      const t = token as any;
+      const s = session as any;
+      if (t && s.user) {
+        s.user.id = t.id;
+        s.user.role = t.role;
+        s.user.trustScore = t.trustScore;
+        s.user.level = t.level;
+        s.user.wardNumber = t.wardNumber;
+        s.user.wardName = t.wardName;
+        s.user.accessToken = t.accessToken;
       }
       return session;
     },

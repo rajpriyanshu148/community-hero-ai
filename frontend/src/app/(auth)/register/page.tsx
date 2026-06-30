@@ -28,7 +28,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<any>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
       ward: 'Ward 12',
@@ -92,20 +92,20 @@ export default function RegisterPage() {
             <Input
               label="Full Name"
               {...register('name')}
-              error={errors.name?.message}
+              error={errors.name?.message as any}
               placeholder="Aarav Mehta"
             />
             <Input
               label="Email Address"
               {...register('email')}
-              error={errors.email?.message}
+              error={errors.email?.message as any}
               placeholder="aarav@example.com"
             />
             <Input
               label="Password"
               type="password"
               {...register('password')}
-              error={errors.password?.message}
+              error={errors.password?.message as any}
               placeholder="••••••••"
             />
 

@@ -13,7 +13,7 @@ export default function MapPage() {
   const [viewMode, setViewMode] = useState<'MAP' | 'HEATMAP'>('MAP');
 
   const { data: issuesData, isLoading } = useIssues({ limit: 100 });
-  const issues = issuesData?.data?.issues || [];
+  const issues = (issuesData as any)?.data?.issues || [];
 
   // Filter issues client-side for immediate feedback
   const filteredIssues = issues.filter((issue: any) => {
@@ -152,7 +152,7 @@ export default function MapPage() {
 
         {/* Render Interactive Issue Marker Pins */}
         <div className="relative w-full h-full">
-          {filteredIssues.map((issue: any, index) => {
+          {filteredIssues.map((issue: any, index: number) => {
             // Map lat/lng coordinates onto percentages of screen width/height for visualization
             const left = `${((issue.lng - 77.58) * 1000) % 80 + 10}%`;
             const top = `${((issue.lat - 12.90) * 1000) % 80 + 10}%`;

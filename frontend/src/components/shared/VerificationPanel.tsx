@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, ShieldAlert, CheckCircle, Loader } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
-import { useIssues } from '../../hooks/useIssues';
+import { useVerifyIssue } from '../../hooks/useIssues';
 import toast from 'react-hot-toast';
 
 interface VerificationPanelProps {
@@ -19,7 +19,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
   onVerified,
 }) => {
   const [loading, setLoading] = useState<string | null>(null);
-  const { verifyIssue } = useIssues();
+  const verifyIssue = useVerifyIssue();
 
   // Calculate percentages
   const existsWeight = verifications.filter(v => v.result === 'EXISTS').reduce((sum, v) => sum + v.trustWeight, 0);
@@ -35,7 +35,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
   const handleVerify = async (result: 'EXISTS' | 'FAKE' | 'RESOLVED') => {
     setLoading(result);
     try {
-      await verifyIssue.mutateAsync({ issueId, result });
+      await verifyIssue.mutateAsync({ id: issueId, data: { result: result as any } });
       toast.success(`Verification cast: marked as ${result.toLowerCase()}`);
       if (onVerified) onVerified();
     } catch (err: any) {
@@ -67,7 +67,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
             <span>FAKE / SPAM</span>
             <span>{fakePercent.toFixed(0)}% ({fakeWeight.toFixed(1)} weight)</span>
           </div>
-          <Progress value={fakePercent} variant="rose" />
+          <Progress value={fakePercent} variant="red" />
         </div>
 
         <div>
@@ -75,7 +75,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
             <span>ALREADY RESOLVED</span>
             <span>{resolvedPercent.toFixed(0)}% ({resolvedWeight.toFixed(1)} weight)</span>
           </div>
-          <Progress value={resolvedPercent} variant="default" />
+          <Progress value={resolvedPercent} variant="cyan" />
         </div>
       </div>
 

@@ -26,7 +26,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<any>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -95,14 +95,14 @@ export default function LoginPage() {
             <Input
               label="Email Address"
               {...register('email')}
-              error={errors.email?.message}
+              error={errors.email?.message as any}
               placeholder="name@example.com"
             />
             <Input
               label="Password"
               type="password"
               {...register('password')}
-              error={errors.password?.message}
+              error={errors.password?.message as any}
               placeholder="••••••••"
             />
 

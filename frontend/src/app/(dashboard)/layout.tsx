@@ -65,7 +65,7 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100">
       {/* Sidebar Navigation */}
-      <Sidebar user={userData} />
+      <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 md:pl-64">

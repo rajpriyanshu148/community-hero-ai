@@ -154,7 +154,7 @@ export function IssueCard({ issue, compact = false, className, showReporter = tr
                 <span className="text-xs text-slate-500">Civic: {issue.civicScore}</span>
               </div>
               {issue.isDuplicate && (
-                <Badge variant="amber" size="xs">Duplicate</Badge>
+                <Badge variant="medium" size="xs">Duplicate</Badge>
               )}
             </div>
           )}

@@ -8,7 +8,7 @@ import { UploadCloud, MapPin, Loader, Mic, Sparkles, Check } from 'lucide-react'
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card } from '../ui/card';
-import { useIssues } from '../../hooks/useIssues';
+import { useIssues, useCreateIssue } from '../../hooks/useIssues';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -35,8 +35,8 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
   const [aiAnalyzing, setAiAnalyzing] = useState(false);
   const [aiData, setAiData] = useState<any>(null);
   
-  const { createIssue } = useIssues();
-  const { location, loading: geoLoading, error: geoError, getLocation } = useGeolocation();
+  const createIssue = useCreateIssue();
+  const { lat, lng, address, loading: geoLoading, error: geoError, getCurrentPosition } = useGeolocation();
 
   const {
     register,
@@ -44,7 +44,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
     setValue,
     watch,
     formState: { errors },
-  } = useForm({
+  } = useForm<any>({
     resolver: zodResolver(issueSchema),
     defaultValues: {
       title: '',
@@ -72,14 +72,16 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
     }
   };
 
-  const handleGetLocation = () => {
-    getLocation();
-    if (location) {
-      setValue('lat', location.lat);
-      setValue('lng', location.lng);
-      setValue('address', location.address || 'Detected Location');
-      setValue('ward', location.ward || 'Ward 12');
+  const handleGetLocation = async () => {
+    try {
+      const loc = await getCurrentPosition();
+      setValue('lat', loc.lat);
+      setValue('lng', loc.lng);
+      setValue('address', loc.address || 'Detected Location');
+      setValue('ward', 'Ward 12');
       toast.success('GPS coordinates locked.');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to get location');
     }
   };
 
@@ -256,7 +258,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
             )}
 
             <div className="flex flex-col gap-4">
-              <Input label="Title" {...register('title')} error={errors.title?.message} placeholder="Brief issue title" />
+              <Input label="Title" {...register('title')} error={errors.title?.message as any} placeholder="Brief issue title" />
               
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-slate-400">Detailed Description</label>
@@ -266,7 +268,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
                   className="bg-slate-950 border border-slate-800 focus:border-cyan-500/50 rounded-lg p-3 text-sm text-white resize-none"
                   placeholder="Detail the hazard, approximate size, impact on flow/safety..."
                 />
-                {errors.description && <span className="text-[10px] text-rose-500 font-bold">{errors.description.message}</span>}
+                {errors.description && <span className="text-[10px] text-rose-500 font-bold">{(errors.description as any).message}</span>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -303,7 +305,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-bold text-slate-400">Location Settings</label>
                 <div className="flex gap-2">
-                  <Input {...register('address')} error={errors.address?.message} placeholder="Geocoded location address" className="flex-1" />
+                  <Input {...register('address')} error={errors.address?.message as any} placeholder="Geocoded location address" className="flex-1" />
                   <Button
                     type="button"
                     variant="outline"

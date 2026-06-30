@@ -10,9 +10,12 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   border?: 'default' | 'cyan' | 'emerald' | 'amber' | 'red' | 'none';
 }
 
-export interface MotionCardProps extends Omit<HTMLMotionProps<'div'>, 'children'>, Omit<CardProps, 'className'> {
-  className?: string;
-  children?: React.ReactNode;
+export interface MotionCardProps extends HTMLMotionProps<'div'> {
+  glow?: 'cyan' | 'emerald' | 'amber' | 'red' | 'purple' | 'none';
+  hover?: boolean;
+  glass?: boolean;
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  border?: 'default' | 'cyan' | 'emerald' | 'amber' | 'red' | 'none';
 }
 
 const glowMap = {
