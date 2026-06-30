@@ -1,72 +1,37 @@
 'use client';
 
-import { useSession, signIn, signOut } from 'next-auth/react';
 import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth.store';
 import type { Role } from '@/types';
 
 export function useAuth() {
-  const { data: session, status } = useSession();
-
-  const isLoading = status === 'loading';
-  const isAuthenticated = status === 'authenticated' && !!session?.user;
-
-  const user = session?.user
-    ? {
-        id: session.user.id,
-        name: session.user.name ?? '',
-        email: session.user.email ?? '',
-        avatar: session.user.image ?? undefined,
-        role: session.user.role,
-        trustScore: session.user.trustScore,
-        level: session.user.level,
-        wardNumber: session.user.wardNumber,
-        wardName: session.user.wardName,
-        accessToken: session.user.accessToken,
-        xp: 0, // loaded separately if needed
-      }
-    : null;
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading, setUser, clearUser } = useAuthStore();
 
   const hasRole = useCallback(
-    (role: Role) => session?.user?.role === role,
-    [session]
+    (role: Role) => user?.role === role,
+    [user]
   );
 
   const hasAnyRole = useCallback(
     (...roles: Role[]) =>
-      roles.some((r) => session?.user?.role === r),
-    [session]
-  );
-
-  const loginWithGoogle = useCallback(async () => {
-    await signIn('google', { callbackUrl: '/dashboard' });
-  }, []);
-
-  const loginWithCredentials = useCallback(
-    async (email: string, password: string) => {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-      return result;
-    },
-    []
+      roles.some((r) => user?.role === r),
+    [user]
   );
 
   const logout = useCallback(async () => {
-    await signOut({ callbackUrl: '/' });
-  }, []);
+    localStorage.removeItem('access_token');
+    clearUser();
+    router.push('/login');
+  }, [clearUser, router]);
 
   return {
     user,
-    session,
     isLoading,
     isAuthenticated,
     hasRole,
     hasAnyRole,
-    loginWithGoogle,
-    loginWithCredentials,
     logout,
-    status,
   };
 }

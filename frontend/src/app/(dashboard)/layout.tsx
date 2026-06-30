@@ -7,6 +7,7 @@ import { NotificationBell } from '../../components/shared/NotificationBell';
 import { Shield, Loader } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function DashboardLayout({
   children,
@@ -35,7 +36,12 @@ export default function DashboardLayout({
         );
 
         if (response.data.success) {
-          setUserData(response.data.data.user);
+          const userVal = response.data.data.user;
+          setUserData(userVal);
+          useAuthStore.getState().setUser({
+            ...userVal,
+            accessToken: token,
+          });
         } else {
           localStorage.removeItem('access_token');
           router.push('/login');

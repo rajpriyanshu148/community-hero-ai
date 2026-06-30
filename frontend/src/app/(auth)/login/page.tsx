@@ -11,6 +11,7 @@ import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Card } from '../../../components/ui/card';
 import axios from 'axios';
+import { useAuthStore } from '../../../store/auth.store';
 import toast from 'react-hot-toast';
 
 const loginSchema = z.object({
@@ -40,8 +41,14 @@ export default function LoginPage() {
 
       if (response.data.success) {
         toast.success('Logged in successfully!');
-        // Store token in local storage or cookie
-        localStorage.setItem('access_token', response.data.data.accessToken);
+        const { user: userData, accessToken } = response.data.data;
+        // Store token in local storage
+        localStorage.setItem('access_token', accessToken);
+        // Set user details in Zustand store
+        useAuthStore.getState().setUser({
+          ...userData,
+          accessToken,
+        });
         router.push('/dashboard');
       }
     } catch (err: any) {

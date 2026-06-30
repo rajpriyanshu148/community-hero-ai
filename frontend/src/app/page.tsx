@@ -32,7 +32,7 @@ export default function LandingPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+      <section id="how-it-works" className="flex-1 max-w-7xl mx-auto w-full px-6 pt-32 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -137,7 +137,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="border-y border-slate-900 bg-slate-950/45 backdrop-blur relative z-10">
+      <section id="impact" className="border-y border-slate-900 bg-slate-950/45 backdrop-blur relative z-10">
         <div className="max-w-7xl mx-auto w-full px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div className="flex flex-col gap-1">
             <span className="text-3xl font-extrabold text-white font-space">
@@ -167,7 +167,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="max-w-7xl mx-auto w-full px-6 py-24 relative z-10 flex flex-col gap-12">
+      <section id="features" className="max-w-7xl mx-auto w-full px-6 py-24 relative z-10 flex flex-col gap-12">
         <div className="text-center max-w-xl mx-auto flex flex-col gap-2">
           <h2 className="text-3xl font-bold tracking-tight text-white font-space">Civic Tech Platform Features</h2>
           <p className="text-slate-450 text-sm">Everything your city needs to collaborate, predict, track, and resolve civic hazards.</p>
@@ -243,7 +243,7 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950/80 py-12 text-center text-slate-500 text-xs mt-auto relative z-10">
+      <footer id="about" className="border-t border-slate-900 bg-slate-950/80 py-12 text-center text-slate-500 text-xs mt-auto relative z-10">
         <div className="max-w-7xl mx-auto w-full px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2 text-white font-bold font-space">
             <Shield className="w-5 h-5 text-cyan-400" />
