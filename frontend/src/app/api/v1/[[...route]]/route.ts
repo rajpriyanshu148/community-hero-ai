@@ -88,7 +88,48 @@ let missions = [
 ];
 
 let userMissions: any[] = [];
-let currentUser = users[2]; // Default logged-in user is Aarav Mehta (Citizen)
+
+// ============================================================
+// Helper functions for stateless cookies-based session management
+// ============================================================
+function getMergedUsers(req: NextRequest) {
+  let customUsers: any[] = [];
+  try {
+    const cookieVal = req.cookies.get('custom_users')?.value;
+    if (cookieVal) {
+      customUsers = JSON.parse(decodeURIComponent(cookieVal));
+    }
+  } catch (err) {
+    console.error('Error parsing custom_users cookie:', err);
+  }
+  return [...users, ...customUsers];
+}
+
+function getCurrentUser(req: NextRequest, mergedUsers: any[]) {
+  const authHeader = req.headers.get('Authorization') || '';
+  const token = authHeader.replace('Bearer ', '').trim();
+  if (token.startsWith('mock-jwt-token-')) {
+    const userId = token.replace('mock-jwt-token-', '');
+    const found = mergedUsers.find(u => u.id === userId);
+    if (found) return found;
+  }
+  // Fallback to default user
+  return mergedUsers[2];
+}
+
+function saveUser(req: NextRequest, response: NextResponse, user: any, merged: any[]) {
+  const customUsersOnly = merged.filter(u => u.id !== '1' && u.id !== '2' && u.id !== '3' && u.id !== '4');
+  const index = customUsersOnly.findIndex(u => u.id === user.id);
+  if (index !== -1) {
+    customUsersOnly[index] = user;
+  } else {
+    customUsersOnly.push(user);
+  }
+  response.cookies.set('custom_users', encodeURIComponent(JSON.stringify(customUsersOnly)), {
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+  });
+}
 
 // ============================================================
 // Catch-All Handler
@@ -98,9 +139,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
   const path = (route || []).join('/');
   const searchParams = req.nextUrl.searchParams;
 
+  const merged = getMergedUsers(req);
+  const user = getCurrentUser(req, merged);
+
   // 1. Auth routes
   if (path === 'auth/me') {
-    return NextResponse.json({ success: true, data: { user: currentUser } });
+    return NextResponse.json({ success: true, data: { user } });
   }
 
   // 2. Issues routes
@@ -108,7 +152,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
     return NextResponse.json({ success: true, data: { issues } });
   }
   if (path === 'issues/my') {
-    const myIssues = issues.filter(i => i.reportedById === currentUser.id);
+    const myIssues = issues.filter(i => i.reportedById === user.id);
     return NextResponse.json({ success: true, data: { issues: myIssues } });
   }
   if (path.startsWith('issues/')) {
@@ -120,20 +164,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
 
   // 3. AI Predictions
   if (path === 'ai/predictions') {
-    const ward = searchParams.get('ward') || 'Ward 12';
+    const ward = searchParams.get('ward') || user.ward || 'Ward 12';
     const wardPreds = predictions.filter(p => p.ward === ward);
     return NextResponse.json({ success: true, data: wardPreds });
   }
 
   // 4. Leaderboard
   if (path === 'leaderboard') {
-    const sortedUsers = [...users].sort((a, b) => b.xp - a.xp);
+    const sortedUsers = [...merged].sort((a, b) => b.xp - a.xp);
     return NextResponse.json({ success: true, data: { users: sortedUsers } });
   }
 
   // 5. Missions
   if (path === 'missions') {
-    const active = userMissions.filter(um => um.userId === currentUser.id && um.status !== 'COMPLETED');
+    const active = userMissions.filter(um => um.userId === user.id && um.status !== 'COMPLETED');
     const available = missions.filter(m => !active.some(a => a.missionId === m.id));
     return NextResponse.json({ success: true, data: { available, active } });
   }
@@ -148,13 +192,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ rout
 
   // 7. Authority assigned
   if (path === 'authority/assigned') {
-    const assigned = issues.filter(i => i.departmentId === 'dept-road' || i.assignedToId === currentUser.id);
+    const assigned = issues.filter(i => i.departmentId === 'dept-road' || i.assignedToId === user.id);
     return NextResponse.json({ success: true, data: { issues: assigned } });
   }
 
   // 8. Admin lists
   if (path === 'admin/users') {
-    return NextResponse.json({ success: true, data: { users } });
+    return NextResponse.json({ success: true, data: { users: merged } });
   }
   if (path === 'admin/fraud') {
     const fraud = issues.filter(i => i.isFraudFlagged);
@@ -168,30 +212,40 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
   const { route } = await params;
   const path = (route || []).join('/');
 
+  const merged = getMergedUsers(req);
+  const user = getCurrentUser(req, merged);
+
   // 1. Login/Register Mock
   if (path === 'auth/login') {
     const body = await req.json();
-    const matched = users.find(u => u.email === body.email);
+    const matched = merged.find(u => u.email === body.email);
     if (!matched) return NextResponse.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
-    currentUser = matched;
-    return NextResponse.json({ success: true, data: { accessToken: 'mock-jwt-token', user: currentUser } });
+    const token = `mock-jwt-token-${matched.id}`;
+    return NextResponse.json({ success: true, data: { accessToken: token, user: matched } });
   }
   if (path === 'auth/register') {
     const body = await req.json();
+    const nextId = String(Date.now());
     const newUser = {
-      id: String(users.length + 1),
+      id: nextId,
       name: body.name,
       email: body.email,
-      role: 'CITIZEN' as any,
+      role: 'CITIZEN',
       trustScore: 50,
       xp: 0,
       level: 1,
-      ward: body.ward,
+      ward: body.ward || 'Ward 12',
       skills: [],
       badges: []
     };
-    users.push(newUser);
-    return NextResponse.json({ success: true, data: { user: newUser } });
+    
+    const updatedCustomUsers = [...merged.filter(u => u.id !== '1' && u.id !== '2' && u.id !== '3' && u.id !== '4'), newUser];
+    const response = NextResponse.json({ success: true, data: { user: newUser } });
+    response.cookies.set('custom_users', encodeURIComponent(JSON.stringify(updatedCustomUsers)), {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+    return response;
   }
 
   // 2. Issue reporting (handles multipart or json)
@@ -225,13 +279,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
       lng: body.lng,
       address: body.address,
       ward: body.ward,
-      reportedById: currentUser.id,
+      reportedById: user.id,
       upvotes: 0,
       civicScore: 40,
       createdAt: new Date().toISOString(),
       verifications: [],
       ledger: [
-        { id: `l-${Date.now()}`, action: 'REPORTED', actorName: currentUser.name, createdAt: new Date().toISOString() }
+        { id: `l-${Date.now()}`, action: 'REPORTED', actorName: user.name, createdAt: new Date().toISOString() }
       ],
       comments: [],
       mediaUrls: ['https://images.unsplash.com/photo-1599740831418-b21a3a97d9e4?auto=format&fit=crop&q=80&w=800'],
@@ -266,7 +320,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
     if (issue) {
       const newComment = {
         id: `c-${Date.now()}`,
-        user: { name: currentUser.name },
+        user: { name: user.name },
         content: body.content,
         createdAt: new Date().toISOString()
       };
@@ -283,8 +337,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
       const newVerify = {
         id: `v-${Date.now()}`,
         result: body.result,
-        trustWeight: currentUser.trustScore / 10,
-        user: { name: currentUser.name }
+        trustWeight: user.trustScore / 10,
+        user: { name: user.name }
       };
       issue.verifications.push(newVerify);
       
@@ -292,7 +346,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
       issue.ledger.push({
         id: `l-${Date.now()}`,
         action: 'STATUS_CHANGED',
-        actorName: currentUser.name,
+        actorName: user.name,
         createdAt: new Date().toISOString()
       });
 
@@ -303,8 +357,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
   // 6. Skills registration
   if (path === 'skills') {
     const body = await req.json();
-    currentUser.skills.push({ id: `s-${Date.now()}`, skill: body.skill });
-    return NextResponse.json({ success: true });
+    user.skills = user.skills || [];
+    user.skills.push({ id: `s-${Date.now()}`, skill: body.skill });
+    
+    const response = NextResponse.json({ success: true });
+    saveUser(req, response, user, merged);
+    return response;
   }
 
   // 7. Mission Accept/Complete
@@ -315,7 +373,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
       userMissions.push({
         id: `um-${Date.now()}`,
         missionId: id,
-        userId: currentUser.id,
+        userId: user.id,
         status: 'ACCEPTED',
         mission
       });
@@ -324,18 +382,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ rou
   }
   if (path.endsWith('/complete')) {
     const id = path.split('/')[1];
-    const match = userMissions.find(um => um.missionId === id && um.userId === currentUser.id);
+    const match = userMissions.find(um => um.missionId === id && um.userId === user.id);
     if (match) {
       match.status = 'COMPLETED';
-      currentUser.xp += match.mission.xpReward;
-      currentUser.level = Math.min(5, Math.floor(currentUser.xp / 1000) + 1);
-      return NextResponse.json({ success: true, data: { xpEarned: match.mission.xpReward } });
+      user.xp += match.mission.xpReward;
+      user.level = Math.min(5, Math.floor(user.xp / 1000) + 1);
+      
+      const response = NextResponse.json({ success: true, data: { xpEarned: match.mission.xpReward } });
+      saveUser(req, response, user, merged);
+      return response;
     }
   }
 
   // 8. Gemini Vision Analysis
   if (path === 'ai/analyze') {
-    // Return mock structured response from Gemini
     const mockAnalysis = {
       issueType: 'POTHOLE',
       severity: 'HIGH',
@@ -356,6 +416,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ro
   const { route } = await params;
   const path = (route || []).join('/');
 
+  const merged = getMergedUsers(req);
+  const user = getCurrentUser(req, merged);
+
   // Status updates
   if (path.endsWith('/status')) {
     const id = path.split('/')[1];
@@ -366,7 +429,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ro
       issue.ledger.push({
         id: `l-${Date.now()}`,
         action: 'STATUS_CHANGED',
-        actorName: currentUser.name,
+        actorName: user.name,
         createdAt: new Date().toISOString()
       });
       return NextResponse.json({ success: true });

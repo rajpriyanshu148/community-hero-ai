@@ -37,19 +37,19 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 const getToken = (): string | null => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  return localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
 };
 
 const setToken = (token: string) => {
   if (typeof window === 'undefined') return;
-  localStorage.setItem('accessToken', token);
+  localStorage.setItem('access_token', token);
 };
 
 const removeTokens = () => {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem('accessToken');
+  localStorage.removeItem('access_token');
   localStorage.removeItem('refreshToken');
-  sessionStorage.removeItem('accessToken');
+  sessionStorage.removeItem('access_token');
 };
 
 const getRefreshToken = (): string | null => {
