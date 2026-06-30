@@ -44,7 +44,25 @@ export function AIAnalysisPanel({ analysis, compact = false, className }: AIAnal
     CRITICAL: { color: '#EF4444', bg: 'bg-red-500/10 border-red-500/20 text-red-400' },
   };
 
-  const impact = impactColorMap[analysis.publicImpact] || impactColorMap.MEDIUM;
+  const impact = impactColorMap[analysis?.publicImpact] || impactColorMap.MEDIUM;
+
+  const reasoningArray = Array.isArray(analysis?.reasoning)
+    ? analysis.reasoning
+    : typeof analysis?.reasoning === 'string'
+    ? [analysis.reasoning]
+    : [];
+
+  const keywordsArray = Array.isArray(analysis?.keywords)
+    ? analysis.keywords
+    : typeof analysis?.keywords === 'string'
+    ? [analysis.keywords]
+    : [];
+
+  const urgencyFactorsArray = Array.isArray(analysis?.urgencyFactors)
+    ? analysis.urgencyFactors
+    : typeof analysis?.urgencyFactors === 'string'
+    ? [analysis.urgencyFactors]
+    : [];
 
   return (
     <motion.div
@@ -160,13 +178,13 @@ export function AIAnalysisPanel({ analysis, compact = false, className }: AIAnal
               </div>
 
               {/* Keywords */}
-              {analysis.keywords?.length > 0 && (
+              {keywordsArray.length > 0 && (
                 <div>
                   <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
                     <Zap className="w-3 h-3 text-cyan-400" /> Keywords
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {analysis.keywords.map((kw, i) => (
+                    {keywordsArray.map((kw, i) => (
                       <span
                         key={i}
                         className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
@@ -179,13 +197,13 @@ export function AIAnalysisPanel({ analysis, compact = false, className }: AIAnal
               )}
 
               {/* Urgency Factors */}
-              {analysis.urgencyFactors?.length > 0 && (
+              {urgencyFactorsArray.length > 0 && (
                 <div>
                   <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3 text-amber-400" /> Urgency Factors
                   </p>
                   <ul className="space-y-1">
-                    {analysis.urgencyFactors.map((factor, i) => (
+                    {urgencyFactorsArray.map((factor, i) => (
                       <li key={i} className="flex items-start gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
                         <span className="text-xs text-slate-400">{factor}</span>
@@ -196,13 +214,13 @@ export function AIAnalysisPanel({ analysis, compact = false, className }: AIAnal
               )}
 
               {/* AI Reasoning */}
-              {analysis.reasoning?.length > 0 && (
+              {reasoningArray.length > 0 && (
                 <div>
                   <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
                     <Lightbulb className="w-3 h-3 text-purple-400" /> AI Reasoning
                   </p>
                   <div className="space-y-2">
-                    {analysis.reasoning.map((reason, i) => (
+                    {reasoningArray.map((reason, i) => (
                       <motion.div
                         key={i}
                         initial={{ opacity: 0, x: -10 }}

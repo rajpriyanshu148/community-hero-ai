@@ -108,7 +108,7 @@ export function Sidebar({ className }: SidebarProps) {
       animate={{ width: sidebarCollapsed ? 72 : 256 }}
       transition={{ duration: 0.25, ease: 'easeInOut' }}
       className={cn(
-        'fixed inset-y-0 left-0 z-35 flex flex-col glass-dark border-r border-border overflow-hidden',
+        'fixed inset-y-0 left-0 z-35 flex flex-col glass-dark border-r border-border',
         className
       )}
     >
@@ -157,7 +157,7 @@ export function Sidebar({ className }: SidebarProps) {
                       ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
                       : item.highlight
                       ? 'bg-gradient-to-r from-cyan-500/15 to-emerald-500/10 text-cyan-300 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-emerald-500/15'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900/40 hover:border-slate-800 border border-transparent'
                   )}
                   title={sidebarCollapsed ? item.label : undefined}
                 >

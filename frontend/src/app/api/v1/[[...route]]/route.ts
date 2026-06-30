@@ -102,7 +102,18 @@ function getMergedUsers(req: NextRequest) {
   } catch (err) {
     console.error('Error parsing custom_users cookie:', err);
   }
-  return [...users, ...customUsers];
+
+  // Merge lists, replacing seed users with custom/modified versions if IDs match
+  const baseUsers = [...users];
+  customUsers.forEach((cu) => {
+    const idx = baseUsers.findIndex(u => u.id === cu.id);
+    if (idx !== -1) {
+      baseUsers[idx] = cu;
+    } else {
+      baseUsers.push(cu);
+    }
+  });
+  return baseUsers;
 }
 
 function getCurrentUser(req: NextRequest, mergedUsers: any[]) {
@@ -118,14 +129,22 @@ function getCurrentUser(req: NextRequest, mergedUsers: any[]) {
 }
 
 function saveUser(req: NextRequest, response: NextResponse, user: any, merged: any[]) {
-  const customUsersOnly = merged.filter(u => u.id !== '1' && u.id !== '2' && u.id !== '3' && u.id !== '4');
-  const index = customUsersOnly.findIndex(u => u.id === user.id);
+  let customUsers: any[] = [];
+  try {
+    const cookieVal = req.cookies.get('custom_users')?.value;
+    if (cookieVal) {
+      customUsers = JSON.parse(decodeURIComponent(cookieVal));
+    }
+  } catch (e) {}
+
+  const index = customUsers.findIndex(u => u.id === user.id);
   if (index !== -1) {
-    customUsersOnly[index] = user;
+    customUsers[index] = user;
   } else {
-    customUsersOnly.push(user);
+    customUsers.push(user);
   }
-  response.cookies.set('custom_users', encodeURIComponent(JSON.stringify(customUsersOnly)), {
+
+  response.cookies.set('custom_users', encodeURIComponent(JSON.stringify(customUsers)), {
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7 days
   });

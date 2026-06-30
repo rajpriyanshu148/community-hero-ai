@@ -7,6 +7,7 @@ import { Button } from '../../../components/ui/button';
 import { TrustScoreRing } from '../../../components/shared/TrustScoreRing';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../../../store/auth.store';
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -280,6 +281,7 @@ export default function ProfilePage() {
                     if (response.data.success) {
                       toast.success('Profile updated successfully!');
                       setUser(response.data.data.user);
+                      useAuthStore.getState().setUser(response.data.data.user);
                       
                       // Sync client fallback database
                       try {
