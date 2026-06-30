@@ -45,6 +45,28 @@ export default function RegisterPage() {
 
       if (response.data.success) {
         toast.success('Registration successful! Please log in.');
+        try {
+          const localUsers = JSON.parse(localStorage.getItem('local_custom_users') || '[]');
+          // Avoid duplicate emails in local fallback list
+          if (!localUsers.some((u: any) => u.email === data.email)) {
+            localUsers.push({
+              id: String(Date.now()),
+              name: data.name,
+              email: data.email,
+              password: data.password,
+              role: 'CITIZEN',
+              trustScore: 50,
+              xp: 0,
+              level: 1,
+              ward: data.ward || 'Ward 12',
+              skills: [],
+              badges: []
+            });
+            localStorage.setItem('local_custom_users', JSON.stringify(localUsers));
+          }
+        } catch (storageErr) {
+          console.error('LocalStorage write failed:', storageErr);
+        }
         router.push('/login');
       }
     } catch (err: any) {
