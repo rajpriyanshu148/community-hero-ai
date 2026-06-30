@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import Providers from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#0f172a" />
       </head>
       <body className="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-cyan-500/30 selection:text-cyan-200">
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
