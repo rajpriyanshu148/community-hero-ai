@@ -39,7 +39,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/register`,
+        `/api/v1/auth/register`,
         data
       );
 

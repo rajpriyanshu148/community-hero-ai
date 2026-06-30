@@ -18,7 +18,7 @@ export default function ProfilePage() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/me`,
+        `/api/v1/auth/me`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
@@ -26,7 +26,7 @@ export default function ProfilePage() {
         
         // Fetch user's reported issues
         const issuesRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/issues/my`,
+          `/api/v1/issues/my`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (issuesRes.data.success) {
@@ -48,7 +48,7 @@ export default function ProfilePage() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/skills`,
+        `/api/v1/skills`,
         { skill: selectedSkill },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -21,7 +21,7 @@ export default function CitizenDashboard() {
       try {
         const token = localStorage.getItem('access_token');
         const userRes = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/me`,
+          `/api/v1/auth/me`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (userRes.data.success) {
@@ -31,7 +31,7 @@ export default function CitizenDashboard() {
           // Fetch predictions for user's ward
           if (userData.ward) {
             const predRes = await axios.get(
-              `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/ai/predictions?ward=${userData.ward}`,
+              `/api/v1/ai/predictions?ward=${userData.ward}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
             if (predRes.data.success) {

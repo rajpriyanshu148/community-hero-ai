@@ -29,7 +29,7 @@ export default function DashboardLayout({
       try {
         // Fetch current user from /auth/me
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/me`,
+          `/api/v1/auth/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

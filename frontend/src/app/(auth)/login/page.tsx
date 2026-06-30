@@ -35,7 +35,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/login`,
+        `/api/v1/auth/login`,
         data
       );
 
@@ -59,9 +59,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `${
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'
-    }/auth/google`;
+    window.location.href = `/api/v1/auth/google`;
   };
 
   return (

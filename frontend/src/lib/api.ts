@@ -1,12 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const BASE_URL = '';
 
 // ========================
 // Axios Instance
 // ========================
 const api: AxiosInstance = axios.create({
-  baseURL: `${BASE_URL}/api`,
+  baseURL: '/api/v1',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ api.interceptors.response.use(
       }
 
       try {
-        const response = await axios.post(`${BASE_URL}/api/auth/refresh`, {
+        const response = await axios.post(`/api/v1/auth/refresh`, {
           refreshToken,
         });
 
@@ -187,7 +187,7 @@ export const authApi = {
   logout: () => apiClient.post('/auth/logout'),
   refresh: (token: string) => apiClient.post('/auth/refresh', { refreshToken: token }),
   me: () => apiClient.get('/auth/me'),
-  googleAuth: () => `${BASE_URL}/api/auth/google`,
+  googleAuth: () => `/api/v1/auth/google`,
 };
 
 export const issuesApi = {
