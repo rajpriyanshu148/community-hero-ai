@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '../../components/shared/Sidebar';
 import { NotificationBell } from '../../components/shared/NotificationBell';
@@ -103,18 +104,18 @@ export default function DashboardLayout({
             {/* Real-time Notification Bell */}
             <NotificationBell />
 
-            {/* Profile Avatar */}
-            <div className="flex items-center gap-2">
+            {/* Profile Avatar Link */}
+            <Link href="/profile" className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center font-bold text-xs text-cyan-400">
                 {userData?.name?.charAt(0) || 'U'}
               </div>
               <div className="hidden sm:flex flex-col gap-0.5">
                 <span className="text-xs font-bold text-white leading-none">{userData?.name}</span>
-                <span className="text-[10px] text-slate-500 uppercase font-bold leading-none">
+                <span className="text-[10px] text-slate-550 uppercase font-bold leading-none">
                   {userData?.role}
                 </span>
               </div>
-            </div>
+            </Link>
           </div>
         </header>
 
