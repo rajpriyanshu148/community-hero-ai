@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sidebar } from '../../components/shared/Sidebar';
 import { NotificationBell } from '../../components/shared/NotificationBell';
-import { Shield, Loader } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/auth.store';
@@ -60,7 +60,7 @@ export default function DashboardLayout({
   if (checkingAuth) {
     return (
       <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center gap-4 z-50">
-        <Loader className="w-8 h-8 text-cyan-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
         <span className="text-xs text-slate-550 font-bold uppercase tracking-wider">
           Verifying credentials...
         </span>

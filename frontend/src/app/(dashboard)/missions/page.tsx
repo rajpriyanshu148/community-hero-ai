@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Target, Compass, Award, Loader } from 'lucide-react';
+import { Target, Compass, Award, Loader2 } from 'lucide-react';
 import { Card } from '../../../components/ui/card';
 import { MissionCard } from '../../../components/shared/MissionCard';
 import axios from 'axios';
@@ -17,7 +17,7 @@ export default function MissionsPage() {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/missions`,
+        `/api/v1/missions`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
@@ -40,8 +40,8 @@ export default function MissionsPage() {
     try {
       const token = localStorage.getItem('access_token');
       const url = action === 'ACCEPT' 
-        ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/missions/${missionId}/accept`
-        : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/missions/${missionId}/complete`;
+        ? `/api/v1/missions/${missionId}/accept`
+        : `/api/v1/missions/${missionId}/complete`;
 
       const response = await axios.post(url, {}, { headers: { Authorization: `Bearer ${token}` } });
 
@@ -70,7 +70,7 @@ export default function MissionsPage() {
 
       {loading ? (
         <div className="flex justify-center items-center py-24">
-          <Loader className="w-8 h-8 text-cyan-400 animate-spin" />
+          <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

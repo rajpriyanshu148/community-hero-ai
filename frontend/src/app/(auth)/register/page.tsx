@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Shield, Sparkles, Loader } from 'lucide-react';
+import { Shield, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Card } from '../../../components/ui/card';
@@ -145,7 +145,7 @@ export default function RegisterPage() {
             </div>
 
             <Button type="submit" variant="civic" className="w-full py-3 h-auto text-sm mt-2" disabled={loading}>
-              {loading ? <Loader className="w-4 h-4 animate-spin mx-auto" /> : 'Register'}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Register'}
             </Button>
           </form>
 

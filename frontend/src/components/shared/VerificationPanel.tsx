@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldCheck, ShieldAlert, CheckCircle, Loader } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, CheckCircle, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { useVerifyIssue } from '../../hooks/useIssues';
@@ -88,7 +88,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
           disabled={loading !== null}
         >
           {loading === 'EXISTS' ? (
-            <Loader className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <ShieldCheck className="w-4 h-4" />
           )}
@@ -102,7 +102,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
           disabled={loading !== null}
         >
           {loading === 'FAKE' ? (
-            <Loader className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <ShieldAlert className="w-4 h-4" />
           )}
@@ -116,7 +116,7 @@ export const VerificationPanel: React.FC<VerificationPanelProps> = ({
           disabled={loading !== null}
         >
           {loading === 'RESOLVED' ? (
-            <Loader className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <CheckCircle className="w-4 h-4" />
           )}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { UploadCloud, MapPin, Loader, Mic, Sparkles, Check } from 'lucide-react';
+import { UploadCloud, MapPin, Loader2, Mic, Sparkles, Check } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card } from '../ui/card';
@@ -226,7 +226,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
               >
                 {aiAnalyzing ? (
                   <>
-                    <Loader className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Analyzing...</span>
                   </>
                 ) : (
@@ -313,7 +313,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
                     onClick={handleGetLocation}
                     disabled={geoLoading}
                   >
-                    {geoLoading ? <Loader className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+                    {geoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
@@ -370,7 +370,7 @@ export const IssueReportForm: React.FC<IssueReportFormProps> = ({ onSuccess }) =
               <Button type="submit" variant="civic" className="flex-1 py-3 h-auto text-sm flex items-center justify-center gap-2" disabled={createIssue.isPending}>
                 {createIssue.isPending ? (
                   <>
-                    <Loader className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                     <span>Submitting...</span>
                   </>
                 ) : (
