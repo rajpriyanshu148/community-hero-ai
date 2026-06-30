@@ -37,7 +37,7 @@ let issues: any[] = [
     comments: [
       { id: 'c1', user: { name: 'Priya Nair' }, content: 'This is highly dangerous, traffic is very slow here.', createdAt: new Date(Date.now() - 60000000).toISOString() }
     ],
-    mediaUrls: ['https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&q=80&w=800'],
+    mediaUrls: ['https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=800'],
     aiAnalysis: {
       issueType: 'POTHOLE',
       severity: 'CRITICAL',
@@ -66,7 +66,7 @@ let issues: any[] = [
       { id: 'l3', action: 'REPORTED', actorName: 'Aarav Mehta', createdAt: new Date(Date.now() - 172800000).toISOString() }
     ],
     comments: [],
-    mediaUrls: ['https://images.unsplash.com/photo-1542013936693-8848e5740a7a?auto=format&fit=crop&q=80&w=800'],
+    mediaUrls: ['https://images.unsplash.com/photo-1585338107529-13afc5f02586?auto=format&fit=crop&q=80&w=800'],
     aiAnalysis: {
       issueType: 'WATER_LEAKAGE',
       severity: 'HIGH',
